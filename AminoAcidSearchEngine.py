@@ -15,21 +15,36 @@ proteomeString = str(proteomeList)
 proteomeList[:] = re.split(r">sp|>tr|\\n", proteomeString)
 del proteomeList[0]
 
+#Define re pattern to extract protein name only from extraneous protein info
+
+namePattern = r'\s[a-zA-Z][^A-Z]*[^=]+'
+
 #Define Class and Functions
 class protein:
 
 	def __init__(self):
 
-		self.proteinName = ""
-		self.sequence = ""
+		self.proteinName = ''
+		self.sequence = ''
 		self.sequencelength = 0
+		self.geneSymbol = ''
+
+	def getName(self, instance):
+		name = re.search(namePattern, instance)
+		proteinName = name.group()
+		self.proteinName = proteinName[1:-3]
+
+	def getGeneSymbol(self, instance):
+		infoLst = instance.split('=')
+		Symbol = infoLst[3]
+		self.geneSymbol = Symbol[0:-3]
 
 	def calculateLength(self):
 		self.sequencelength = len(self.sequence)
 
-#Define re pattern to extract protein name only from extraneous protein info
-pattern = r'\s[a-zA-Z][^A-Z]*[^=]+'
-proteinName = ""
+
+proteinName = ''
+geneSymbol = ''
 species = "sapiens"
 dataDict = {}
 #counter to create unique key for dictionary
@@ -38,18 +53,12 @@ currentKey = None
 for line in proteomeList:
 	#Use species as line identifier so that proteomes for other species can be run without changing loop
 	if species in line:
-		proteinName = re.search(pattern, line)
-		if proteinName:
-			#Extract protein name
-			i += 1
-			proteinName = proteinName.group()
-			proteinName = proteinName[1:-3]
-			#Create class instance for each protein and use counter to create unique key for dictionary
-			proteinInstance = protein()
-			proteinInstance.proteinName = proteinName
-			currentKey = (i, proteinName)
-			#Create/add to Dictionary
-			dataDict[currentKey] = proteinInstance
+		i += 1
+		proteinInstance = protein()
+		proteinInstance.getName(line)
+		proteinInstance.getGeneSymbol(line)
+		currentKey = (i, proteinInstance.geneSymbol)
+		dataDict[currentKey] = proteinInstance
 
 	else:
 		#if line contains sequence data, add sequence to the current class instance and calculate the length
@@ -61,21 +70,22 @@ keys = sorted(dataDict)
 rankedDict = {}
 for key in keys:
 	proteinInstance = dataDict[key]
-	newKey = (proteinInstance.sequencelength, proteinInstance.proteinName)
+	newKey = (proteinInstance.sequencelength, proteinInstance.proteinName, proteinInstance.geneSymbol)
 	rankedDict[newKey] = proteinInstance
 
 rankedDict = sorted(rankedDict)
 # Ask user to search for protein and return results, do this until user enters 'quit'
 
 while True:
-	print("\nEnter a keyword from the name of your protein(s) of interest to get the amino acid length(s):\n")
+	print("\nEnter the gene symbol or a keyword from the name of your protein(s) of interest to get the amino acid length(s):\n")
 	print("Enter 'quit' to exit search engine at any time\n")
 	userSearch = input()
 	searchResultCounter = 0
 	for key in rankedDict:
-		if userSearch.lower() in key[1].lower():
+		if userSearch.lower() in key[1].lower() or userSearch.lower() in key[2].lower():
 			searchResultCounter += 1
-			print("\n", searchResultCounter,'-', key[1], "is", key[0], "amino acids in length")
+			# print("\n", searchResultCounter,'-', key[1],'(',key[2],')',"is", key[0], "amino acids in length")
+			print("\n{} - {} ({}) is {} amino acids in length".format(searchResultCounter, key[1], key[2],key[0]))
 		elif userSearch.lower() == 'quit':
 			sys.exit()
 	else:
@@ -84,5 +94,3 @@ while True:
 		else:
 			print("\n", "Your search returned", searchResultCounter, "protein(s).")
 		
-
-
