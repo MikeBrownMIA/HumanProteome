@@ -78,19 +78,39 @@ rankedDict = sorted(rankedDict)
 # Ask user to search for protein and return results, do this until user enters 'quit'
 
 while True:
-	print("\nEnter the gene symbol or a keyword from the name of your protein(s) of interest to find its size in kDa:\n")
+	print("\nEnter the gene symbol or a keyword for the name of your protein(s) of interest to find its size in kDa:\n")
 	print("Enter 'quit' to exit search engine at any time\n")
 	userSearch = input()
 	searchResultCounter = 0
+	resultList = []
 	for key in rankedDict:
-		if userSearch.lower() in key[1].lower() or userSearch.lower() in key[2].lower():
-			searchResultCounter += 1
-			print("\n{} - {} ({}) is approximately {} kDa.".format(searchResultCounter, key[1], key[2], '{:.1f}'.format(key[0])))
-		elif userSearch.lower() == 'quit':
-			sys.exit()
+		try:
+			#Check if there is an exact match for the gene symbol
+			if userSearch.lower() == key[2].lower():
+				resultList = []
+				searchResultCounter = 1
+				print("\n{} - {} ({}) is approximately {} kDa.".format(searchResultCounter, key[1], key[2], '{:.1f}'.format(key[0])))
+				break
+			else:
+				#Code will intentionally fail to push code to except statement
+				searchResultCounter = key[1] % key[2]
+			#If no exact matches, return all matches containing search criteria
+		except:
+			if userSearch.lower() in key[1].lower() or userSearch.lower() in key[2].lower():
+				searchResultCounter += 1
+				result = (key[0], key[1], key[2])
+				resultList.append(result)
+		
+			elif userSearch.lower() == 'quit':
+				sys.exit()
+
 	else:
 		if searchResultCounter == 0:
 			print("\nNo search results found for:", userSearch)
 		else:
+			searchResultCounter = 0
+			for key in resultList:
+				searchResultCounter += 1
+				print("\n{} - {} ({}) is approximately {} kDa.".format(searchResultCounter, key[1], key[2], '{:.1f}'.format(key[0])))
 			print("\n", "Your search returned", searchResultCounter, "protein(s).")
 		
