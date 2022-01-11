@@ -16,7 +16,6 @@ proteomeList[:] = re.split(r">sp|>tr|\\n", proteomeString)
 del proteomeList[0]
 
 #Define re pattern to extract protein name only from extraneous protein info
-
 namePattern = r'\s[a-zA-Z][^A-Z]*[^=]+'
 
 #Define Class and Functions
@@ -46,8 +45,6 @@ class protein:
 	def estimateSize(self):
 		self.estimatedSize = self.sequencelength * 0.110
 
-proteinName = ''
-geneSymbol = ''
 species = "sapiens"
 dataDict = {}
 #counter to create unique key for dictionary
@@ -74,7 +71,6 @@ keys = sorted(dataDict)
 rankedDict = {}
 for key in keys:
 	proteinInstance = dataDict[key]
-	newKey = (proteinInstance.sequencelength, proteinInstance.proteinName, proteinInstance.geneSymbol)
 	newKey = (proteinInstance.estimatedSize, proteinInstance.proteinName, proteinInstance.geneSymbol)
 	rankedDict[newKey] = proteinInstance
 
