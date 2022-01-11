@@ -28,6 +28,7 @@ class protein:
 		self.sequence = ''
 		self.sequencelength = 0
 		self.geneSymbol = ''
+		self.estimatedSize = 0
 
 	def getName(self, instance):
 		name = re.search(namePattern, instance)
@@ -42,6 +43,8 @@ class protein:
 	def calculateLength(self):
 		self.sequencelength = len(self.sequence)
 
+	def estimateSize(self):
+		self.estimatedSize = self.sequencelength * 0.110
 
 proteinName = ''
 geneSymbol = ''
@@ -64,6 +67,7 @@ for line in proteomeList:
 		#if line contains sequence data, add sequence to the current class instance and calculate the length
 		dataDict[currentKey].sequence = line
 		dataDict[currentKey].calculateLength()
+		dataDict[currentKey].estimateSize()
 
 # create a new dictionary where the keys consist of a tuple of the sequence length and protein name
 keys = sorted(dataDict)
@@ -71,6 +75,7 @@ rankedDict = {}
 for key in keys:
 	proteinInstance = dataDict[key]
 	newKey = (proteinInstance.sequencelength, proteinInstance.proteinName, proteinInstance.geneSymbol)
+	newKey = (proteinInstance.estimatedSize, proteinInstance.proteinName, proteinInstance.geneSymbol)
 	rankedDict[newKey] = proteinInstance
 
 rankedDict = sorted(rankedDict)
@@ -84,8 +89,7 @@ while True:
 	for key in rankedDict:
 		if userSearch.lower() in key[1].lower() or userSearch.lower() in key[2].lower():
 			searchResultCounter += 1
-			# print("\n", searchResultCounter,'-', key[1],'(',key[2],')',"is", key[0], "amino acids in length")
-			print("\n{} - {} ({}) is {} amino acids in length".format(searchResultCounter, key[1], key[2],key[0]))
+			print("\n{} - {} ({}) is approximately {} kDa.".format(searchResultCounter, key[1], key[2], '{:.1f}'.format(key[0])))
 		elif userSearch.lower() == 'quit':
 			sys.exit()
 	else:
