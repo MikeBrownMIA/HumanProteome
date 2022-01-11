@@ -78,7 +78,7 @@ rankedDict = sorted(rankedDict)
 # Ask user to search for protein and return results, do this until user enters 'quit'
 
 while True:
-	print("\nEnter the gene symbol or a keyword from the name of your protein(s) of interest to get the amino acid length(s):\n")
+	print("\nEnter the gene symbol or a keyword from the name of your protein(s) of interest to find its size in kDa:\n")
 	print("Enter 'quit' to exit search engine at any time\n")
 	userSearch = input()
 	searchResultCounter = 0
