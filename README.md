@@ -1,4 +1,3 @@
-# HumanProteome
 # Protein Size Search Engine for Human Proteome
 
 ### Code can be run from command line using Python 3 to find the estimated size (in kDa) of any protein of interest in the human proteome. 
